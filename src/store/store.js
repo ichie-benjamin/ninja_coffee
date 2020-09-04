@@ -103,7 +103,7 @@ const actions = {
   getStocks(context) {
     let user = state.currentUser;
     let stocks = [];
-      firebaseDb.collection("items").where('store_id', '==', user.userId).get().then
+      firebaseDb.collection("items").where('store_id', '==', user.userId).orderBy("name", "asc").get().then
       ((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           stocks.push(doc.data());
@@ -152,7 +152,7 @@ const actions = {
   },
   getProducts(context) {
     let products = [];
-    firebaseDb.collection("products").orderBy('date').get().then
+    firebaseDb.collection("products").orderBy("name", "asc").get().then
     ((querySnapshot) => {
       querySnapshot.forEach((doc) => {
         products.push(doc.data());
