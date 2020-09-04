@@ -7,24 +7,22 @@
 <!--      </div>-->
       <div class="column q-mt-md">
         <q-list>
-          <template>
-            <q-card v-if="orders.length > 0" v-for="item in orders" :key="item.id" flat bordered class=" my-card q-mb-sm">
-              <q-item class="">
+          <template  v-if="orders.length > 0">
+            <q-card v-for="item in orders" :key="item.id" flat bordered class=" my-card q-mb-sm">
+              <q-item class="" clickable @click="goto(item.user_id, item.id)">
                 <q-item-section>
-                  <q-item-label class="text-negative text-bold text-h6">{{ item.product_name }} X {{ item.volume }}</q-item-label>
+                  <q-item-label class="text-negative text-bold text-h6"> {{ item.store }}</q-item-label>
                   <q-item-label class=" text-bold" caption>{{ formateDate(item.date)}}</q-item-label>
 
-                  <q-item-label class="text-cente text-bold text-secondary">Store Details</q-item-label>
 
+<!--                  <q-item-label class="text-bold text-secondary q-mt-sm">Order Details</q-item-label>-->
 
-                  <q-item-label>{{ item.store }}</q-item-label>
+                  <q-item-label class=" text-bold" caption>Items : {{ item.qty }}</q-item-label>
+                  <q-item-label class=" text-bold" caption>Total Stock : {{ item.stock }}</q-item-label>
 
+                  <q-item-label v-if="item.variant" class=" text-bold" caption>Variant : {{ item.variant }}</q-item-label>
 
-                  <q-item-label class="text-bold text-secondary q-mt-sm">Order Details</q-item-label>
-
-                  <q-item-label class=" text-bold" caption>Unit Price : ({{ item.amount }} X {{ item.volume }})</q-item-label>
-
-                  <q-item-label>Total : ${{ item.volume * item.amount }}</q-item-label>
+<!--                  <q-item-label>Total : £{{ item.volume * item.amount }}</q-item-label>-->
 
                 </q-item-section>
 
@@ -36,6 +34,18 @@
             </q-card>
 
           </template>
+
+          <template v-else>
+          <q-card  flat bordered  class=" my-card q-mb-sm">
+            <q-item class="q-pt-xl q-pb-xl">
+              <q-item-section class="justify-center">
+                <q-item-label class="text-negative text-bold text-center text-h6">No Pending Orders</q-item-label>
+
+              </q-item-section>
+            </q-item>
+          </q-card>
+
+</template>
 
         </q-list>
       </div>
@@ -98,6 +108,9 @@ export default {
       }).onOk(() => {
         this.delete(item)
       })
+    },
+    goto(id,ref){
+      this.$router.push('/order/'+id+'/'+ref);
     },
   },
   computed : {

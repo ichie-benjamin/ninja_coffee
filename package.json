@@ -9,6 +9,7 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@johmun/vue-tags-input": "^2.1.0",
     "@quasar/extras": "^1.9.5",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",

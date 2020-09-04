@@ -11,6 +11,10 @@ import {VueRouter} from "vue-router";
 import {firebaseAuth} from "boot/firebase";
 import AddStock from "pages/admin/AddStock";
 import AddShop from "pages/admin/AddShop";
+import UpdateStock from "pages/admin/UpdateStock";
+import StockOverview from "pages/admin/StockOverview";
+import Carts from "pages/admin/Carts";
+import OrderDetails from "pages/admin/OrderDetails";
 
 const routes = [
   {
@@ -27,8 +31,12 @@ const routes = [
       { path: '', component: AdminIndex, meta: { requiresAuth: true}  },
       { path: 'stores', component: StoreIndex, meta: { requiresAuth: true, name: 'Stores'}  },
       { path: 'orders', component: Orders, meta: { requiresAuth: true, name: 'Orders'}  },
+      { path: 'cart', component: Carts, meta: { requiresAuth: true, name: 'Cart'}  },
       { path: 'add/stock', component: AddStock, meta: { requiresAuth: true, name: 'Add Stock'}  },
+      { path: 'update/stock', component: UpdateStock, meta: { requiresAuth: true, name: 'Update Stock'}  },
+      { path: 'stock/overview', component: StockOverview, meta: { requiresAuth: true, name: 'Stock Overview'}  },
       { path: 'add/store', component: AddShop, meta: { requiresAuth: true, name: 'Add Store'}  },
+      {path: '/order/:id/:ref', component: OrderDetails, meta: {name: "Order Details"}},
     ]
   },
   {

@@ -4,23 +4,25 @@
       <div class="q-gutter-md text-black" style="width: 90vw">
 
         <q-form @submit.prevent="update" class="q-gutter-md">
-          <div v-if="product_id">
-          <q-item-label class="text-bold text-center text-h6 q-mb-md">Update {{  form.name }} Stock :</q-item-label>
-          <q-input  v-model="form.volume" :rules="[val => !!val || 'Field is required']" clearable label="Volume : " />
-          <q-input v-model="form.good_amount" clearable type="number" label="Good Amount : " />
+          <div v-if="order_id">
+            <q-item-label class="text-bold text-center text-h6 q-mb-md">Update {{  form.product_name }} Stock :</q-item-label>
+            <q-item-label class="text-negative">Remaining volume : {{ form.volume - vol}}</q-item-label>
+            <q-input  v-model="vol" type="number" :rules="[val => !!val || 'Field is required']" clearable label="Sold Qty : " />
 
-          <q-item-label class="q-mt-lg">Barcode : {{ result }} </q-item-label>
+            <q-input v-model="form.volume" hint="Available Stock" disable clearable type="number" label="Available Stock : " />
+
+            <q-item-label class="q-mt-lg">Barcode : {{ result }} </q-item-label>
 
           </div>
           <StreamBarcodeReader v-if="scan"
-            @decode="onDecode"
+                               @decode="onDecode"
           ></StreamBarcodeReader>
 
 
           <div>
             <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
-            <q-btn v-if="product_id" label="Update Stock" :disable="not_working" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="warning"/>
+            <q-btn v-if="order_id" label="Update Stock" :disable="not_working" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="warning"/>
 
           </div>
         </q-form>
@@ -37,11 +39,12 @@ import { StreamBarcodeReader } from "vue-barcode-reader";
 
 import { uid } from 'quasar'
 export default {
-  name: "AddStock",
+  name: "UpdateStock",
   data(){
     return {
       result: '',
-      product_id : '',
+      order_id : '',
+      vol:0,
       not_working:true,
       product:{},
       scan:false,
@@ -60,26 +63,37 @@ export default {
   },
   methods:{
 
-    update(){
-      firebaseDb.collection('products').doc(this.product_id).set(this.form)
-        .then( docRef => {
-          this.$q.notify({
-            message: 'success',
-            color: 'secondary'
-          })
+    update() {
+      this.form.volume = this.form.volume - this.vol;
+      if (this.form.volume < 0) {
+        this.$q.notify({
+          message: 'Sorry you cant have a negative volume',
+          color: 'negative'
         })
+      } else {
+        this.$q.loading.show();
+        firebaseDb.collection('orders').doc(this.order_id).set(this.form)
+        .then(docRef => {
+          this.$q.notify({
+            message: 'successfully updated',
+            color: 'secondary'
+          });
+          this.vol = 0;
+          this.$q.loading.hide();
+        })
+    }
     },
     onDecode (result) {
       this.result = result;
       this.updated = false,
-      firebaseDb.collection("products").where('barcode', '==', result).get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            this.product_id = doc.id;
-            this.form = doc.data();
-            this.not_working = false;
+        firebaseDb.collection("orders").where('barcode', '==', result).get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              this.order_id = doc.id;
+              this.form = doc.data();
+              this.not_working = false;
+            })
           })
-        })
       this.scan = false;
     },
     async onInit (promise) {

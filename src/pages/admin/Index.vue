@@ -82,6 +82,17 @@
           <q-item-label class="q-mt-sm">Add</q-item-label>
 
       </div>
+      <div class="col-4 box" style="width: 100%!important;" @click="goto('/admin/update/stock')">
+
+          <q-icon name="local_grocery_store" size="34px" />
+          <q-item-label class="q-mt-sm">Update Stock</q-item-label>
+
+      </div>    <div class="col-4 box" style="width: 100%!important;" @click="goto('admin/stock/overview')">
+
+          <q-icon name="storefront" size="34px" />
+          <q-item-label class="q-mt-sm">Stock Overview</q-item-label>
+
+      </div>
 <!--      <div class="col-4 box1">-->
 
 <!--      </div>-->

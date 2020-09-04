@@ -2,32 +2,20 @@
   <q-page class="flex q-pa-md flex-center">
     <div class="column full-width q-mt-md ">
       <div class="column items-center q-mb-md">
-
-        <!--        <img class="items-center" src="~assets/foodex_logo.png" height="60px" width="60" />-->
       </div>
       <q-tab-panel name="register">
 
         <q-form @submit="submitForm">
-
-<!--          <div v-if="reg_success.length < 3">-->
-<!--            <q-item-label class="text-center q-mb-md" style="font-weight: lighter; font-size: 1.5em;">Welcome back!</q-item-label>-->
-<!--          </div>-->
-
           <div class="text-center q-mb-md text-bold text-accent" v-if="authError">
             {{ authError }}
           </div>
-          <div class="text-center q-mb-md text-bold text-info" v-if="reg_success">
-            {{ reg_success }}
-          </div>
-
-
 
           <q-input
             v-model="formData.email"
             class="q-mb-md"
             :error="has_error && errors.email ? true : false"
             type="text"
-            :hint="formData.email.length > 0 ? 'say email to reenter email address' : '' "
+            :hint="formData.email.length > 0 ? 'enter your email address' : '' "
             label="Email Address">
             <template  v-slot:append>
               <q-icon v-show="formData.email.length > 0" name="cancel" @click.stop="formData.email = ''" class="cursor-pointer" />
@@ -128,14 +116,21 @@ export default {
       this.$q.loading.show();
       firebaseAuth.signInWithEmailAndPassword(this.formData.email, this.formData.password)
         .then((response) => {
-            alert('Login Successful');
+            this.$q.notify({
+              message: 'Login successfully',
+              color: 'secondary'
+            });
             this.$store.commit("store/loginSuccess", 'login successful');
-            this.$router.push('/admin');
+            this.$router.push('/');
             this.$q.loading.hide();
             this.loading = false;
           },
           err => {
-            alert(err.message)
+
+            this.$q.notify({
+              message: err.message,
+              color: 'negative'
+            });
             this.loading = false;
             this.$q.loading.hide();
             console.log(err.message)
@@ -146,7 +141,7 @@ export default {
 
   },
   computed: {
-    ...mapState('store', ['authError','currentUser','reg_success']),
+    ...mapState('store', ['authError','currentUser']),
   },
   watch : {
   },

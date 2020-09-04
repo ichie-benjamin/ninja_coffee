@@ -48,6 +48,7 @@
           :class="nav.is_center ? 'center' : ''"
           :label="nav.is_center ? '' : nav.label"
         >
+          <q-badge v-if="nav.label === 'Cart' && carts.length > 0" color="red" floating>{{ carts.length }}</q-badge>
         </q-route-tab>
       </q-tabs>
     </q-footer>
@@ -107,10 +108,10 @@ export default {
           to: "/"
         },
         {
-          label: "Orders",
-          icon: "contact_support",
+          label: "Cart",
+          icon: "shopping_cart",
           is_center:0,
-          to: "/admin/orders"
+          to: "/admin/cart"
         }
       ]
 
@@ -124,6 +125,7 @@ export default {
     }
   },
   computed:{
+    ...mapState('store', ['carts', 'currentUser']),
     title() {
       let currentPath = this.$route.fullPath;
       if (currentPath == '/') return 'Dashboard'

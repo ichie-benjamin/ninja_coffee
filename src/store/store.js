@@ -8,21 +8,13 @@ const state = {
   products:[],
   orders:[],
   stores:[],
+  stocks:[],
+  carts:[],
   authError: null,
 }
 const mutations = {
   setUserDetail(state, payload){
     state.currentUser = payload
-  },
-  remove_product(state,id){
-    let index = state.carts.findIndex( (cart) => {
-      return cart.id == id
-    });
-    if(index !== -1) {
-      state.carts.splice(index, 1);
-      axios.post("/cart/delete", {'id':id})
-        .then();
-    }
   },
 
   updateStores(state, payload) {
@@ -31,6 +23,14 @@ const mutations = {
 
   updateOrders(state, payload) {
     state.orders = payload;
+  },
+
+  updateStocks(state, payload) {
+    state.stocks = payload;
+  },
+
+  updateCarts(state, payload) {
+    state.carts = payload;
   },
 
   updateProducts(state, payload) {
@@ -90,15 +90,65 @@ const actions = {
       context.commit('updateStores', stores);
     });
   },
-  getOrders(context) {
-    let orders = [];
-    firebaseDb.collection("orders").get().then
+  getCarts(context){
+    let carts = [];
+    firebaseDb.collection("carts").doc(state.currentUser.userId).collection('details').get().then
     ((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        orders.push(doc.data());
+        carts.push(doc.data());
       });
-      context.commit('updateOrders', orders);
+      context.commit('updateCarts', carts);
     });
+  },
+  getStocks(context) {
+    let user = state.currentUser;
+    let stocks = [];
+      firebaseDb.collection("items").where('store_id', '==', user.userId).get().then
+      ((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          stocks.push(doc.data());
+        });
+        context.commit('updateStocks', stocks);
+      });
+  },
+
+  getOrders(context) {
+    let orders = [];
+    let user = state.currentUser;
+    if(user.is_admin){
+      firebaseDb.collection("orders").get().then
+      ((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          let item = {}
+          item.id = doc.id;
+          item.date = doc.data().date;
+          item.qty = doc.data().qty;
+          item.stock = doc.data().stock;
+          item.store = doc.data().store;
+          item.user_id = doc.data().user_id;
+          item.fulfilled = doc.data().fulfilled;
+          orders.push(item);
+        });
+        context.commit('updateOrders', orders);
+      })
+    }else {
+      firebaseDb.collection("orders").where('user_id', '==', user.userId).get().then
+      ((queryOrder) => {
+        queryOrder.forEach((doc) => {
+          let item = {}
+          item.id = doc.id;
+          item.date = doc.data().date;
+          item.qty = doc.data().qty;
+          item.stock = doc.data().stock;
+          item.store = doc.data().store;
+          item.user_id = doc.data().user_id;
+          item.fulfilled = doc.data().fulfilled;
+          orders.push(item);
+        });
+        context.commit('updateOrders', orders);
+      })
+    }
+
   },
   getProducts(context) {
     let products = [];

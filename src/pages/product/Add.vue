@@ -9,6 +9,16 @@
         <q-input v-model="form.volume" clearable type="number" :rules="[val => !!val || 'Product Vol/Qty is required']" label="Volume : " />
         <q-input class="q-pb-md" v-model="form.type" clearable label="Type : " />
 
+          <div>
+            <q-item-label class="q-mb-sm">Product Variants : </q-item-label>
+            <vue-tags-input
+              v-model="form.tag"
+              :tags="tags"
+              @tags-changed="newTags => tags = newTags"
+            />
+          </div>
+
+
           <StreamBarcodeReader v-if="scan" @decode="onDecode"></StreamBarcodeReader>
 
           <q-input v-model="form.barcode" :rules="[val => !!val || 'Barcode is required']" clearable label="Barcode : " />
@@ -31,6 +41,7 @@ import {firebaseDb} from "boot/firebase";
 import {mapActions, mapState} from "vuex";
 import { uid } from 'quasar'
 import {StreamBarcodeReader} from "vue-barcode-reader";
+import VueTagsInput from '@johmun/vue-tags-input';
 export default {
   name: "Add",
   data(){
@@ -38,8 +49,11 @@ export default {
       scan:false,
       loading : true,
       error:false,
+      tags:[],
+      lists:[],
       form:{
         name:'',
+        tag:'',
         low_amount:'',
         good_amount:'',
         volume:'',
@@ -53,11 +67,20 @@ export default {
   },
   methods:{
     ...mapActions('store', ['getStores']),
+    push(){
+      let list = [];
+      this.tags.forEach(function(item) {
+        list.push(item.text)
+      });
+      this.lists = list.join(', ');
+    },
     submit(){
+      this.push();
       if(!this.loading){
         firebaseDb.collection('products').add({
           barcode : this.form.barcode,
           date : Date.now(),
+          variants:this.lists,
           good_amount : this.form.good_amount,
           id : uid().toString(),
           low_amount : this.form.low_amount,
@@ -70,8 +93,12 @@ export default {
           })
           .catch(error => console.log(err))
       }else {
-        let msg = "Product with barcode :" + this.form.barcode + " already exit";
-        alert(msg)
+        let msg = "Product with barcode :" + this.form.barcode + " already exit, or scanner not used";
+
+        this.$q.notify({
+          message: msg,
+          color: 'negative'
+        });
       }
 
     },
@@ -82,7 +109,7 @@ export default {
         .then(querySnapshot => {
           this.loading = false
           querySnapshot.forEach(doc => {
-            console.log(doc.exists)
+
             if (doc.exists) {
               this.error = true
               this.loading = true
@@ -96,7 +123,7 @@ export default {
     ...mapState('store', ['stores']),
   },
   components: {
-    StreamBarcodeReader,
+    StreamBarcodeReader,VueTagsInput
   }
 }
 </script>

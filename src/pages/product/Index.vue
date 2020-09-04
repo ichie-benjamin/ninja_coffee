@@ -1,6 +1,6 @@
 <template>
-  <q-page class="">
-    <div class="q-pa-md">
+  <q-page class="" style="margin-bottom: 100px">
+    <div class="q-pa-md" v-if="!scan">
       <div class="q-gutter-md full-width" style="" >
         <q-input v-model="text" label="Search" />
 
@@ -14,11 +14,18 @@
               <q-item-section>
                 <q-item-label lines="1">{{  item.name }}</q-item-label>
                 <q-item-label caption>{{ item.type}}</q-item-label>
-                <q-item-label caption>Qty : {{ item.volume}}</q-item-label>
+                <q-item-label v-if="!currentUser.is_admin" caption>Qty : {{ item.volume}}</q-item-label>
               </q-item-section>
               <q-item-section side>
-                ${{ item.good_amount}}
-                <q-btn v-if="currentUser.is_admin" class="" @click="confirm(item)" color="red" size="12px" flat dense round icon="delete" />
+                <template v-if="currentUser.is_admin">
+                  <q-item-label caption class="text-bold">Available Vol</q-item-label>
+                  <q-item-label caption class="text-bold">{{ formatNum(item.volume) }}</q-item-label>
+                  <q-btn  class="" @click="confirm(item)" color="red" size="12px" flat dense round icon="delete" />
+                </template>
+                <template v-else>
+                  <q-item-label caption class="text-bold">£{{ formatNum(item.good_amount) }}</q-item-label>
+                </template>
+
               </q-item-section>
             </q-item>
             <q-separator inset="item" />
@@ -27,27 +34,74 @@
         </q-list>
       </div>
     </div>
+    <div class="q-pa-md" v-else>
+      <q-btn color="red" flat icon="cancel" @click="scan = false" />
+
+      <StreamBarcodeReader v-if="scanner"
+                           @decode="onDecode"
+      ></StreamBarcodeReader>
+
+      <q-btn @click="scanner = !scanner" :label="scanner ? 'Close Scanner' : 'Open Scanner' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
+
+
+      <q-card style="min-width: 350px" v-if="scan && product.name">
+        <form @submit.prevent="orderProduct">
+          <q-card-section>
+            <div class="text-h6 text-center">Buy [{{ product.name }}]</div>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-section class="q-pt-none">
+            <q-input v-model="product.good_amount" disable type="number" label="Good Amount : " />
+            <q-input v-model="form.volume" :rules="[ val => !!val || 'Volume is required']"
+                     clearable :hint="product.volume+' Stock Available'" type="number" label="Volume : " />
+
+            <q-item-label v-if="form.volume > product.volume - 1" class="text-negative">You can order more than our current stock</q-item-label>
+
+          </q-card-section>
+
+          <q-card-actions align="right" class="text-primary">
+            <q-btn v-if="parseInt(form.volume) < parseInt(product.volume)" flat label="Create Order" type="submit" />
+          </q-card-actions>
+        </form>
+      </q-card>
+
+    </div>
+
     <q-dialog v-model="prompt" persistent>
       <q-card style="min-width: 350px" >
-        <form @submit="orderProduct">
-        <q-card-section>
-          <div class="text-h6 text-center">Buy [{{ product.name }}]</div>
-        </q-card-section>
+        <form @submit.prevent="orderProduct">
+          <q-card-section>
+            <div class="text-h6 text-center">Buy [{{ product.name }}]</div>
+          </q-card-section>
 
-        <q-separator />
+          <q-separator />
 
-        <q-card-section class="q-pt-none">
-          <q-input v-model="product.good_amount" disable type="number" label="Good Amount : " />
-          <q-input v-model="form.volume" :rules="[ val => val <= 3 || 'Insufficient quantity in warehouse', val => !!val || 'Volume is required']" clearable type="number" label="Volume : " />
-        </q-card-section>
+          <q-card-section class="q-pt-none">
+            <q-input v-model="product.good_amount" disable type="number" label="Good Amount : " />
+            <q-select v-if="variants.length > 0" v-model="form.variant" :options="variants" label="Variant" />
 
-        <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup />
-          <q-btn flat label="Create Order" type="submit" />
-        </q-card-actions>
+            <q-input v-model="form.volume" :rules="[ val => !!val || 'Volume is required']"
+                     clearable :hint="product.volume+' Stock Available'" type="number" label="Volume : " />
+
+            <q-item-label v-if="form.volume > product.volume - 1" class="text-negative">You can order more than our current stock</q-item-label>
+
+
+          </q-card-section>
+
+          <q-card-actions align="right" class="text-primary">
+            <q-btn flat label="Cancel" v-close-popup />
+            <q-btn v-if="parseInt(form.volume) < parseInt(product.volume)" flat label="Create Order" type="submit" />
+          </q-card-actions>
         </form>
       </q-card>
     </q-dialog>
+
+
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn @click="openScan" label="scan" fab  color="black" />
+    </q-page-sticky>
   </q-page>
 </template>
 
@@ -55,6 +109,8 @@
 import {mapActions, mapState} from "vuex";
 import {firebaseDb} from "boot/firebase";
 import {uid} from "quasar";
+import { StreamBarcodeReader } from "vue-barcode-reader";
+
 
 export default {
   name: "Index",
@@ -62,6 +118,9 @@ export default {
     return {
       text:'',
       prompt:false,
+      scan:false,
+      scanner:false,
+      variants:[],
       product:{
         name:null,
         good_amount:null,
@@ -69,6 +128,7 @@ export default {
       form : {
         product_id : '',
         volume : '',
+        variant:'',
         // userId : this.currentUser.userId,
       }
     }
@@ -77,34 +137,24 @@ export default {
     this.getProducts();
   },
   methods : {
-    ...mapActions('store', ['getProducts']),
+    ...mapActions('store', ['getProducts','getCarts']),
+    openScan(){
+      this.scan = true;
+      this.scanner = true;
+    },
     orderProduct(){
       this.$q.loading.show();
       this.form.date = Date.now();
-      firebaseDb.collection('orders').add(this.form)
+      firebaseDb.collection('carts').doc(this.currentUser.userId).collection('details').doc(this.form.product_id).set(this.form)
         .then( docRef => {
-          firebaseDb.collection("products").where('id', '==', this.form.product_id).get()
-            .then(querySnapshot => {
-              querySnapshot.forEach(doc => {
-                let product_id = doc.id;
-                this.product.volume = this.product.volume - this.form.volume;
-                firebaseDb.collection("products").doc(product_id).set(this.product).then(({
-
-                })).catch(error => {
-                  this.$q.loading.hide()
-                })
+         this.getCarts();
+          this.prompt = false
                 this.$q.loading.hide();
                 this.$q.notify({
-                  message: 'Order successfully placed',
+                  message: 'Item successfully added to cart',
                   color: 'secondary'
-                })
-              })
-            })
-            .catch(error => {
-              this.$q.loading.hide()
-              console.log(error)
-            })
-          this.prompt = false
+                });
+          this.$q.loading.hide();
         }).catch(error => {
           this.$q.loading.hide();
       })
@@ -113,6 +163,7 @@ export default {
       if(this.currentUser.userId) {
 
         this.product = item
+        this.variants = item.variants ? item.variants.split(",") : [];
         this.form.product_id = item.id;
         this.form.userId = this.currentUser.userId;
         this.form.store = this.currentUser.name;
@@ -155,6 +206,9 @@ export default {
           this.$q.loading.hide()
         });
     },
+    formatNum(num) {
+      return new Intl.NumberFormat().format(num);
+    },
     confirm (item) {
       this.$q.dialog({
         title: 'Confirm',
@@ -165,9 +219,27 @@ export default {
         this.delete(item)
       })
     },
+    onDecode (result) {
+      this.result = result;
+      this.updated = false,
+        firebaseDb.collection("products").where('barcode', '==', result).get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              this.buyProduct(doc.data());
+                // this.order_id = doc.id;
+                // this.form = doc.data();
+                this.not_working = false;
+            })
+          })
+      this.scan = false;
+    },
+
   },
   computed : {
     ...mapState('store', ['products', 'currentUser']),
+  },
+  components: {
+    StreamBarcodeReader,
   }
 }
 </script>
