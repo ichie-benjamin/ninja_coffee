@@ -1,13 +1,13 @@
 <template>
   <q-page class="flex flex-center">
     <div class="q-pa-md">
-      <div class="q-gutter-md text-black" style="width: 90vw">
+      <div class="q-gutter-md text-main" style="width: 90vw">
 
         <q-form @submit.prevent="update" class="q-gutter-md">
           <div v-if="product_id">
           <q-item-label class="text-bold text-center text-h6 q-mb-md">Update {{  form.name }} Stock :</q-item-label>
           <q-input  v-model="form.volume" :rules="[val => !!val || 'Field is required']" clearable label="Volume : " />
-          <q-input v-model="form.good_amount" clearable type="number" label="Good Amount : " />
+          <q-input v-model="form.good_amount" clearable type="number" label="Wholesale Price : " />
 
           <q-item-label class="q-mt-lg">Barcode : {{ result }} </q-item-label>
 

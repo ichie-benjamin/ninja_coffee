@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="bg-info no-shadow text-black">
+    <q-header elevated class="bg-info bg-main no-shadow text-main">
       <q-toolbar>
         <q-btn
           flat
@@ -27,7 +27,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-footer elevated bordere class="bg-info no-shadow text-white">
+    <q-footer elevated bordere class="bg-info text-main no-shadow">
       <q-tabs v-if="currentUser.is_admin" dense no-caps class="text-black">
         <q-route-tab
           v-for="nav in admin_navs"
@@ -54,7 +54,7 @@
     </q-footer>
 
 
-    <q-page-container class="bg-info">
+    <q-page-container class="bg-info- bg-main">
       <router-view />
     </q-page-container>
   </q-layout>

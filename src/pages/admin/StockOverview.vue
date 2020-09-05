@@ -22,7 +22,7 @@
 
                   <q-item-label class=" text-bold" caption>Remaining Vol. : #{{ item.qty }}</q-item-label>
 
-                  <q-item-label>Unit Price : £{{  item.amount }}</q-item-label>
+                  <q-item-label>Wholesale Price : £{{  item.amount }}</q-item-label>
 
                 </q-item-section>
 

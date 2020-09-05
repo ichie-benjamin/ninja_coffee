@@ -1,5 +1,5 @@
 <template>
-  <q-page class="" style="margin-bottom: 100px">
+  <q-page class="text-main" style="margin-bottom: 100px">
     <div class="q-pa-md" v-if="!scan">
       <div class="q-gutter-md full-width" style="" >
         <q-input v-model="text" label="Search" />
@@ -53,7 +53,7 @@
           <q-separator />
 
           <q-card-section class="q-pt-none">
-            <q-input v-model="product.good_amount" disable type="number" label="Good Amount : " />
+            <q-input v-model="product.good_amount" disable type="number" label="Wholesale Price : " />
             <q-input v-model="form.volume" :rules="[ val => !!val || 'Volume is required']"
                      clearable :hint="product.volume+' Stock Available'" type="number" label="Volume : " />
 
@@ -79,20 +79,20 @@
           <q-separator />
 
           <q-card-section class="q-pt-none">
-            <q-input v-model="product.good_amount" disable type="number" label="Good Amount : " />
+            <q-input v-model="product.good_amount" disable type="number" label="Wholesale Price : " />
             <q-select v-if="variants.length > 0" v-model="form.variant" :options="variants" label="Variant" />
 
             <q-input v-model="form.volume" :rules="[ val => !!val || 'Volume is required']"
                      clearable :hint="product.volume+' Stock Available'" type="number" label="Volume : " />
 
-            <q-item-label v-if="form.volume > product.volume - 1" class="text-negative">You can order more than our current stock</q-item-label>
+            <q-item-label v-if="form.volume > product.volume - 1" class="text-negative">You can't order more than the available warehouse stock</q-item-label>
 
 
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
             <q-btn flat label="Cancel" v-close-popup />
-            <q-btn v-if="parseInt(form.volume) < parseInt(product.volume)" flat label="Create Order" type="submit" />
+            <q-btn v-if="parseInt(form.volume) < parseInt(product.volume)" flat label="Add to Cart" type="submit" />
           </q-card-actions>
         </form>
       </q-card>

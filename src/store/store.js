@@ -103,7 +103,7 @@ const actions = {
   getStocks(context) {
     let user = state.currentUser;
     let stocks = [];
-      firebaseDb.collection("items").where('store_id', '==', user.userId).orderBy("name", "asc").get().then
+      firebaseDb.collection("items").where('store_id', '==', user.userId).get().then
       ((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           stocks.push(doc.data());

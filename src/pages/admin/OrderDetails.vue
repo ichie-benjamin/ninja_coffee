@@ -14,7 +14,7 @@
               <q-item class="">
                 <q-item-section>
                   <q-item-label class="text-negative  text-bold text-h6">{{ item.product_name }} X {{ item.volume }}</q-item-label>
-                  <q-item-label class=" text-bold" caption>Unit Price : ({{ item.amount }} X {{ item.volume }})</q-item-label>
+                  <q-item-label class=" text-bold" caption>Wholesale Price : ({{ item.amount }} X {{ item.volume }})</q-item-label>
 
                   <q-item-label class=" text-bold text-capitalize" caption>Variant : {{ item.variant }}</q-item-label>
 

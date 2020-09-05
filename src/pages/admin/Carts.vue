@@ -32,7 +32,7 @@
 
                   <!--                  <q-item-label class="text-bold text-secondary q-mt-sm">Order Details</q-item-label>-->
 
-                  <q-item-label class=" text-bold" caption>Unit Price : ({{ item.amount }} X {{ item.volume }})</q-item-label>
+                  <q-item-label class=" text-bold" caption>Wholesale Price : ({{ item.amount }} X {{ item.volume }})</q-item-label>
 
                   <q-item-label>Total : £{{ item.volume * item.amount }}</q-item-label>
 

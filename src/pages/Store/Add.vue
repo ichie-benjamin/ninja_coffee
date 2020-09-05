@@ -6,7 +6,7 @@
         <q-form @submit="" class="q-gutter-md">
         <q-input  v-model="form.name" clearable label="Name : " />
         <q-input class="q-mt-md" v-model="form.low_amount"  clearable type="number" label="Low Amount : " />
-        <q-input v-model="form.good_amount" clearable type="number" label="Good Amount : " />
+        <q-input v-model="form.good_amount" clearable type="number" label="Wholesale Price : " />
         <q-input v-model="form.volume" clearable type="number" label="Volume : " />
         <q-input class="q-pb-md" v-model="form.type" clearable label="Type : " />
 
