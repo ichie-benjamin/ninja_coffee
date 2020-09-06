@@ -28,6 +28,8 @@
 
           <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
+          <q-btn @click="scanIt()" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
+
           <q-btn label="Add" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="warning"/>
         </div>
         </q-form>
@@ -63,10 +65,41 @@ export default {
     }
   },
   created(){
-
+    this.prepDevice()
   },
   methods:{
     ...mapActions('store', ['getStores']),
+    scanIt(){
+      QRScanner.useBackCamera(function(err, status){
+        err && console.error(err);
+        console.log(status);
+      });
+    },
+    prepDevice(){
+      QRScanner.prepare(this.onDone); // show the prompt
+    },
+    onDone(err, status){
+  if (err) {
+    // here we can handle errors and clean up any loose ends.
+    console.error(err);
+    alert("preparing: error code = " + err)
+  }
+  if (status.authorized) {
+    alert('authroized');
+    // W00t, you have camera access and the scanner is initialized.
+    // QRscanner.show() should feel very fast.
+  } else if (status.denied) {
+    alert('denied');
+    // The video preview will remain black, and scanning is disabled. We can
+    // try to ask the user to change their mind, but we'll have to send them
+    // to their device settings with `QRScanner.openSettings()`.
+  } else {
+    alert('permission not asks')
+    // we didn't get permission, but we didn't get permanently denied. (On
+    // Android, a denial isn't permanent unless the user checks the "Don't
+    // ask again" box.) We can ask again at the next relevant opportunity.
+  }
+},
     push(){
       let list = [];
       this.tags.forEach(function(item) {
