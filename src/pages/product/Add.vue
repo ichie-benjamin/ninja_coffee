@@ -23,7 +23,7 @@
 
 
 
-<!--          <StreamBarcodeReader v-if="scan" @decode="onDecode"></StreamBarcodeReader>-->
+          <StreamBarcodeReader v-if="scan" @decode="onDecode"></StreamBarcodeReader>
 
           <q-input v-model="form.barcode" :rules="[val => !!val || 'Barcode is required']" clearable label="Barcode : " />
 
@@ -33,7 +33,7 @@
 
 <!--          <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>-->
 
-          <q-btn @click="scanBarcode()" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
+          <q-btn @click="checkScan()" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
           <q-btn label="Add" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="warning"/>
         </div>
@@ -55,6 +55,9 @@ import { uid } from 'quasar'
 
 import {StreamBarcodeReader} from "vue-barcode-reader";
 import VueTagsInput from '@johmun/vue-tags-input';
+
+import { Platform } from 'quasar'
+
 export default {
   name: "Add",
   data(){
@@ -83,6 +86,14 @@ export default {
   methods:{
     ...mapActions('store', ['getStores']),
 
+    checkScan(){
+      if(Platform.is.cordova){
+        this.scanBarcode()
+      }else {
+        this.scan = !this.scan
+      }
+    },
+
     scanBarcode () {
       var self = this;
       var code = '';
@@ -109,45 +120,23 @@ export default {
       );
     },
 
+    onDecode(result) {
+      this.error = false
+      this.form.barcode = result;
+      firebaseDb.collection("products").where('barcode', '==', result).get()
+        .then(querySnapshot => {
+          this.loading = false
+          querySnapshot.forEach(doc => {
 
-    stopScan(){
-      // cordova.plugins.barcodeScanner.exit();
-
+            if (doc.exists) {
+              this.error = true
+              this.loading = true
+            }
+          })
+        })
+      this.scan = false
     },
-    // scanIts() {
-    //   cordova.plugins.barcodeScanner.scan(
-    //     function (result) {
-    //       alert("We got a barcode\n" +
-    //         "Result: " + result.text + "\n" +
-    //         "Format: " + result.format + "\n" +
-    //         "Cancelled: " + result.cancelled);
-    //     },
-    //     function (error) {
-    //       alert("Scanning failed: " + error);
-    //     },
-    //   {
-    //     preferFrontCamera : true, // iOS and Android
-    //       showFlipCameraButton : true, // iOS and Android
-    //     showTorchButton : true, // iOS and Android
-    //     torchOn: true, // Android, launch with the torch switched on (if available)
-    //     saveHistory: true, // Android, save scan history (default false)
-    //     prompt : "Place a barcode inside the scan area", // Android
-    //     resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-    //     formats : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
-    //     orientation : "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
-    //     disableAnimations : true, // iOS
-    //     disableSuccessBeep: false // iOS and Android
-    //   }
-    //   );
-    // },
 
-
-    //
-    // document.querySelector("#scan").addEventListener("touchend", function() {
-    //   window.QRScanner.scan(displayContents);
-    //
-    // });
-    //
 
 
     push(){
@@ -184,22 +173,6 @@ export default {
         });
       }
 
-    },
-    onDecode(result) {
-      this.error = false
-      this.form.barcode = result;
-      firebaseDb.collection("products").where('barcode', '==', result).get()
-        .then(querySnapshot => {
-          this.loading = false
-          querySnapshot.forEach(doc => {
-
-            if (doc.exists) {
-              this.error = true
-              this.loading = true
-            }
-          })
-        })
-      this.scan = false
     },
   },
   computed:{

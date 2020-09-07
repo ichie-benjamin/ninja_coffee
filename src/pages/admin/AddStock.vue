@@ -18,7 +18,9 @@
 
 
           <div>
-            <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
+<!--            <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>-->
+
+            <q-btn  @click="checkScan()" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
             <q-btn v-if="product_id" label="Update Stock" :disable="not_working" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="warning"/>
 
@@ -35,7 +37,7 @@ import {mapActions, mapState} from "vuex";
 
 import { StreamBarcodeReader } from "vue-barcode-reader";
 
-import { uid } from 'quasar'
+import {Platform, uid} from 'quasar'
 export default {
   name: "AddStock",
   data(){
@@ -69,6 +71,41 @@ export default {
           })
         })
     },
+
+    checkScan(){
+      if(Platform.is.cordova){
+        this.scanBarcode()
+      }else {
+        this.scan = !this.scan
+      }
+    },
+
+    scanBarcode () {
+      var self = this;
+      var code = '';
+      cordova.plugins.barcodeScanner.scan(
+        function (result) {
+          if(result.text)
+          {
+            code += result.text
+            code = code.replace("+", "%2B")
+            self.onDecode(code)
+          }
+
+          else
+          {
+            //alert("Scanning cancelled or failed")
+          }
+
+        },
+
+        function (error) {
+          alert("Scanning failed: " + error);
+        },
+
+      );
+    },
+
     onDecode (result) {
       this.result = result;
       this.updated = false,

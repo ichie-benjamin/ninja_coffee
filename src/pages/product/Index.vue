@@ -43,6 +43,8 @@
 
       <q-btn @click="scanner = !scanner" :label="scanner ? 'Close Scanner' : 'Open Scanner' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
+<!--      <q-btn @click="scanner = !scanner" :label="scanner ? 'Close Scanner' : 'Open Scanner' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>-->
+
 
       <q-card style="min-width: 350px" v-if="scan && product.name">
         <form @submit.prevent="orderProduct">
@@ -108,7 +110,7 @@
 <script>
 import {mapActions, mapState} from "vuex";
 import {firebaseDb} from "boot/firebase";
-import {uid} from "quasar";
+import {Platform, uid} from "quasar";
 import { StreamBarcodeReader } from "vue-barcode-reader";
 
 
@@ -139,9 +141,48 @@ export default {
   methods : {
     ...mapActions('store', ['getProducts','getCarts']),
     openScan(){
-      this.scan = true;
-      this.scanner = true;
+      if(Platform.is.cordova){
+        this.scanBarcode()
+      }else {
+        this.scan = true;
+        this.scanner = true;
+      }
     },
+    checkScan(){
+      if(Platform.is.cordova){
+        this.scanBarcode()
+      }else {
+        this.scan = !this.scan
+      }
+    },
+
+    scanBarcode () {
+      var self = this;
+      var code = '';
+      cordova.plugins.barcodeScanner.scan(
+        function (result) {
+          if(result.text)
+          {
+            code += result.text
+            code = code.replace("+", "%2B")
+            self.onDecode(code)
+          }
+
+          else
+          {
+            //alert("Scanning cancelled or failed")
+          }
+
+        },
+
+        function (error) {
+          alert("Scanning failed: " + error);
+        },
+
+      );
+    },
+
+
     orderProduct(){
       this.$q.loading.show();
       this.form.date = Date.now();
