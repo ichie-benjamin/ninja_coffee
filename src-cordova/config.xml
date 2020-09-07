@@ -72,8 +72,8 @@
         <splash src="res/screen/ios/Default@2x~ipad~comany.png" />
     </platform>
     <allow-navigation href="about:*" />
-    <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
-        <string>To scan barcodes</string>
-    </edit-config>
     <preference name="SplashMaintainAspectRatio" value="true" />
+    <plugin name="phonegap-plugin-barcodescanner" spec="^8.1.0">
+        <variable name="CAMERA_USAGE_DESCRIPTION" value="To scan barcodes" />
+    </plugin>
 </widget>

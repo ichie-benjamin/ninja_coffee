@@ -18,17 +18,22 @@
             />
           </div>
 
+<!--          QRScanner.show();-->
 
-          <StreamBarcodeReader v-if="scan" @decode="onDecode"></StreamBarcodeReader>
+
+
+
+<!--          <StreamBarcodeReader v-if="scan" @decode="onDecode"></StreamBarcodeReader>-->
 
           <q-input v-model="form.barcode" :rules="[val => !!val || 'Barcode is required']" clearable label="Barcode : " />
 
           <q-item-label v-if="error" class="text-negative">Product with barcode : {{ form.barcode }} already exit</q-item-label>
         <div>
 
-          <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
-          <q-btn @click="scanIt()" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
+<!--          <q-btn @click="scan = !scan" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>-->
+
+          <q-btn @click="scanBarcode()" :label="scan ? 'Close Scanner' : 'Scan Barcode' " class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="button" color="dark"/>
 
           <q-btn label="Add" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="warning"/>
         </div>
@@ -39,9 +44,15 @@
 </template>
 
 <script>
+
+
+
+
 import {firebaseDb} from "boot/firebase";
 import {mapActions, mapState} from "vuex";
 import { uid } from 'quasar'
+
+
 import {StreamBarcodeReader} from "vue-barcode-reader";
 import VueTagsInput from '@johmun/vue-tags-input';
 export default {
@@ -49,7 +60,9 @@ export default {
   data(){
     return {
       scan:false,
+      scann:false,
       loading : true,
+      scanning:true,
       error:false,
       tags:[],
       lists:[],
@@ -65,41 +78,78 @@ export default {
     }
   },
   created(){
-    this.prepDevice()
+    // this.prepDevice()
   },
   methods:{
     ...mapActions('store', ['getStores']),
-    scanIt(){
-      QRScanner.useBackCamera(function(err, status){
-        err && console.error(err);
-        console.log(status);
-      });
+
+    scanBarcode () {
+      var self = this;
+      var code = '';
+      cordova.plugins.barcodeScanner.scan(
+        function (result) {
+          if(result.text)
+          {
+            code += result.text
+            code = code.replace("+", "%2B")
+            self.onDecode(code)
+          }
+
+          else
+          {
+            //alert("Scanning cancelled or failed")
+          }
+
+        },
+
+        function (error) {
+          alert("Scanning failed: " + error);
+        },
+
+      );
     },
-    prepDevice(){
-      QRScanner.prepare(this.onDone); // show the prompt
+
+
+    stopScan(){
+      // cordova.plugins.barcodeScanner.exit();
+
     },
-    onDone(err, status){
-  if (err) {
-    // here we can handle errors and clean up any loose ends.
-    console.error(err);
-    alert("preparing: error code = " + err)
-  }
-  if (status.authorized) {
-    alert('authroized');
-    // W00t, you have camera access and the scanner is initialized.
-    // QRscanner.show() should feel very fast.
-  } else if (status.denied) {
-    alert('denied');
-    // The video preview will remain black, and scanning is disabled. We can
-    // try to ask the user to change their mind, but we'll have to send them
-    // to their device settings with `QRScanner.openSettings()`.
-  } else {
-    alert('permission not asks')
-    // we didn't get permission, but we didn't get permanently denied. (On
-    // Android, a denial isn't permanent unless the user checks the "Don't
-    // ask again" box.) We can ask again at the next relevant opportunity.
-  }
-},
+    // scanIts() {
+    //   cordova.plugins.barcodeScanner.scan(
+    //     function (result) {
+    //       alert("We got a barcode\n" +
+    //         "Result: " + result.text + "\n" +
+    //         "Format: " + result.format + "\n" +
+    //         "Cancelled: " + result.cancelled);
+    //     },
+    //     function (error) {
+    //       alert("Scanning failed: " + error);
+    //     },
+    //   {
+    //     preferFrontCamera : true, // iOS and Android
+    //       showFlipCameraButton : true, // iOS and Android
+    //     showTorchButton : true, // iOS and Android
+    //     torchOn: true, // Android, launch with the torch switched on (if available)
+    //     saveHistory: true, // Android, save scan history (default false)
+    //     prompt : "Place a barcode inside the scan area", // Android
+    //     resultDisplayDuration: 500, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+    //     formats : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
+    //     orientation : "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
+    //     disableAnimations : true, // iOS
+    //     disableSuccessBeep: false // iOS and Android
+    //   }
+    //   );
+    // },
+
+
+    //
+    // document.querySelector("#scan").addEventListener("touchend", function() {
+    //   window.QRScanner.scan(displayContents);
+    //
+    // });
+    //
+
+
     push(){
       let list = [];
       this.tags.forEach(function(item) {
@@ -135,7 +185,7 @@ export default {
       }
 
     },
-    onDecode (result) {
+    onDecode(result) {
       this.error = false
       this.form.barcode = result;
       firebaseDb.collection("products").where('barcode', '==', result).get()
@@ -164,5 +214,8 @@ export default {
 <style scoped lang="scss">
 .no-border {
   border-radius: 0;
+}
+.scann {
+  background: transparent !important;
 }
 </style>
