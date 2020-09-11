@@ -6,9 +6,6 @@ import ProductIndex from "pages/product/Index";
 import StoreIndex from "pages/Store/Index";
 import Orders from "pages/admin/Orders";
 
-
-import {VueRouter} from "vue-router";
-import {firebaseAuth} from "boot/firebase";
 import AddStock from "pages/admin/AddStock";
 import AddShop from "pages/admin/AddShop";
 import UpdateStock from "pages/admin/UpdateStock";
@@ -73,42 +70,3 @@ const routes = [
 
 
 export default routes
-
-
-// let router = new VueRouter({routes})
-//
-
-// router.beforeEach((to, from, next) => {
-//   if(to.matched.some(record => record.meta.requiresAuth)){
-//     //check if not Logged in
-//     if(!firebaseAuth.currentUser){
-//       //Go to login page
-//       next({
-//         path:'/login',
-//         query:{
-//           redirect: to.fullPath
-//         }
-//       })
-//     }else {
-//       //proceed to route
-//       next();
-//     }
-//   }else if(to.matched.some(record => record.meta.requiresGuest)){
-//     if(firebaseAuth.currentUser){
-//       //Go to page
-//       next({
-//         path:'/',
-//         query:{
-//           redirect: to.fullPath
-//         }
-//       })
-//     }else {
-//       //proceed to route
-//       next();
-//     }
-//   }else {
-//     //proceed to route
-//     next();
-//   }
-// })
-

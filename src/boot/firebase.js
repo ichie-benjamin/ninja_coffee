@@ -7,7 +7,7 @@ import "firebase/analytics";
 // Add the Firebase products that you want to use
 import "firebase/auth";
 import "firebase/firestore";
-import {login} from "boot/general";
+
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -25,6 +25,8 @@ let firebaseApp = firebase.initializeApp(firebaseConfig);
 var secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
 
 let firebaseAuth = firebaseApp.auth();
+
+// firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
 
 // const createUser = firebase.functions().httpsCallable('createUser');

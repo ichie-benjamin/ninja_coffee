@@ -5,6 +5,7 @@ import { LocalStorage } from 'quasar'
 // const user = getLocalUser();
 const state = {
   currentUser: {},
+  isLoggedIn: !!localStorage.getItem('token'),
   products:[],
   orders:[],
   stores:[],
@@ -48,14 +49,11 @@ const mutations = {
     state.authError = null;
     state.isLoggedIn = true;
     state.loading = false;
-    state.currentUser = Object.assign({}, payload.user, {token: payload.access_token});
-    LocalStorage.set("user", JSON.stringify(state.currentUser));
+    LocalStorage.set("token", payload);
   },
   logout(state) {
-    LocalStorage.remove("user");
+    LocalStorage.remove("token");
     state.isLoggedIn = false;
-    state.carts = [],
-    state.currentUser = null;
   },
   loginFailed(state, payload) {
     state.loading = false;
@@ -162,6 +160,7 @@ const actions = {
   },
 
   handleAuthStateChanged({ commit }){
+    // let token = LocalStorage.getItem('token')
     firebaseAuth.onAuthStateChanged(user => {
       if (user) {
         // User is signed in.

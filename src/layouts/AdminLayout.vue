@@ -8,7 +8,6 @@
           v-go-back.single
           dense
           round
-          @click="logout"
           icon="arrow_back"
           aria-label="Logout"
         />
@@ -120,6 +119,7 @@ export default {
   methods:{
     logout(){
       firebaseAuth.signOut().then(()=>{
+        this.$store.commit("store/logout");
         this.$router.push('/login');
       })
     }

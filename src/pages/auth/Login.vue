@@ -116,11 +116,12 @@ export default {
       this.$q.loading.show();
       firebaseAuth.signInWithEmailAndPassword(this.formData.email, this.formData.password)
         .then((response) => {
+            let userId = firebaseAuth.currentUser.uid;
             this.$q.notify({
               message: 'Login successfully',
               color: 'secondary'
             });
-            this.$store.commit("store/loginSuccess", 'login successful');
+            this.$store.commit("store/loginSuccess", userId);
             this.$router.push('/');
             this.$q.loading.hide();
             this.loading = false;
