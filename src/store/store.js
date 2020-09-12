@@ -83,7 +83,11 @@ const actions = {
     firebaseDb.collection("users").where("is_admin", "==", false).get().then
     ((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        stores.push(doc.data());
+        let item = {}
+        item.id = doc.id;
+        item.name = doc.data().name;
+        item.email = doc.data().email;
+        stores.push(item);
       });
       context.commit('updateStores', stores);
     });

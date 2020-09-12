@@ -26,7 +26,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-footer elevated bordere class="bg-info text-main no-shadow">
+    <q-footer elevated bordere class="bg-info justify-center text-main no-shadow">
       <q-tabs v-if="currentUser.is_admin" dense no-caps class="text-black">
         <q-route-tab
           v-for="nav in admin_navs"

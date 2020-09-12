@@ -12,6 +12,8 @@ import UpdateStock from "pages/admin/UpdateStock";
 import StockOverview from "pages/admin/StockOverview";
 import Carts from "pages/admin/Carts";
 import OrderDetails from "pages/admin/OrderDetails";
+import All from "pages/Store/All";
+import StoreOverview from "pages/admin/StoreOverview";
 
 const routes = [
   {
@@ -27,6 +29,7 @@ const routes = [
     children: [
       { path: '', component: AdminIndex, meta: { requiresAuth: true}  },
       { path: 'stores', component: StoreIndex, meta: { requiresAuth: true, name: 'Stores'}  },
+      { path: 'check/stores', component: All, meta: { requiresAuth: true, name: 'Store Stocks'}  },
       { path: 'orders', component: Orders, meta: { requiresAuth: true, name: 'Orders'}  },
       { path: 'cart', component: Carts, meta: { requiresAuth: true, name: 'Cart'}  },
       { path: 'add/stock', component: AddStock, meta: { requiresAuth: true, name: 'Add Stock'}  },
@@ -34,6 +37,7 @@ const routes = [
       { path: 'stock/overview', component: StockOverview, meta: { requiresAuth: true, name: 'Stock Overview'}  },
       { path: 'add/store', component: AddShop, meta: { requiresAuth: true, name: 'Add Store'}  },
       {path: '/order/:id/:ref', component: OrderDetails, meta: {name: "Order Details"}},
+      {path: '/store/:id/:name', component: StoreOverview, meta: {name: "Store Stock"}},
     ]
   },
   {
