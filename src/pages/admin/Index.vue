@@ -13,7 +13,7 @@
         <q-icon name="local_grocery_store" size="34px" />
         <q-item-label class="q-mt-sm">Check</q-item-label>
       </div>
-      <div class="col-4 box">
+      <div class="col-4 box" @click="goto('/admin/stores')">
         <q-icon name="remove_shopping_cart" size="34px" />
         <q-item-label class="q-mt-sm">Shop</q-item-label>
       </div>

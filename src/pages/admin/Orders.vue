@@ -9,7 +9,7 @@
         <q-list>
           <template  v-if="orders.length > 0">
             <q-card v-for="item in orders" :key="item.id" flat bordered class=" my-card q-mb-sm">
-              <q-item class="" clickable @click="goto(item.user_id, item.id)">
+              <q-item class="" clickable>
                 <q-item-section>
                   <q-item-label class="text-negative text-bold text-h6"> {{ item.store }}</q-item-label>
                   <q-item-label class=" text-bold" caption>{{ formateDate(item.date)}}</q-item-label>
@@ -28,7 +28,8 @@
 
 
                 <q-item-section side top>
-                  <q-btn v-if="currentUser.is_admin" class="" @click="confirm(item)" color="red" size="12px" flat dense round icon="delete" />
+                  <q-btn v-if="currentUser.is_admin" class="q-mb-md" @click="confirm(item)" color="red" size="12px" flat dense round icon="delete" />
+                  <q-btn class="q-pr-sm q-pl-sm"  @click="goto(item.user_id, item.id)" color="warning" size="12px" dense label="VIEW" />
                 </q-item-section>
               </q-item>
             </q-card>
@@ -75,11 +76,8 @@ export default {
     },
     delete(item){
       this.$q.loading.show();
-      firebaseDb.collection("orders").where('id', '==', item.id).get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            let id = doc.id;
-            firebaseDb.collection("orders").doc(id).delete().then(()=>{
+      console.log(item.id)
+            firebaseDb.collection("orders").doc(item.id).delete().then(()=>{
               this.$q.notify({
                 message: 'Order successfully deleted',
                 color: 'secondary'
@@ -93,9 +91,8 @@ export default {
                 color: 'negative'
               });
             })
-          })
-        })
         .catch(error => {
+          console.log(error);
           this.$q.loading.hide()
         });
     },
@@ -106,6 +103,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
+
         this.delete(item)
       })
     },

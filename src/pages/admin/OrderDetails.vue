@@ -25,7 +25,7 @@
 
                 <q-item-section side top>
 <!--                  <q-item-label class=" text-bold" caption>{{ formateDate(item.date)}}</q-item-label>-->
-                  <q-btn  class="" @click="confirm(item)" color="red" size="17px" flat dense round icon="delete" />
+<!--                  <q-btn  class="" @click="confirm(item)" color="red" size="17px" flat dense round icon="delete" />-->
                 </q-item-section>
               </q-item>
             </q-card>

@@ -5,7 +5,7 @@
         <q-form @submit.prevent="submit" class="q-gutter-md">
         <q-input  v-model="form.name" :rules="[val => !!val || 'Product name is required']" clearable label="Name : " />
 <!--        <q-input v-model="form.low_amount"  clearable type="number" label="Low Amount : " />-->
-        <q-input v-model="form.good_amount" :rules="[val => !!val || 'Wholesale Price is required']" clearable type="number" label="Wholesale Price : " />
+        <q-input step="any" prefix="£" v-model="form.good_amount" :rules="[val => !!val || 'Wholesale Price is required']" clearable type="number" label="Wholesale Price : " />
         <q-input v-model="form.volume" clearable type="number" :rules="[val => !!val || 'Product Vol/Qty is required']" label="Volume : " />
         <q-input class="q-pb-md" v-model="form.type" clearable label="Type : " />
 
