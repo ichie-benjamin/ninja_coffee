@@ -13,8 +13,10 @@
 
               <q-item-section>
                 <q-item-label lines="1">{{  item.name }}</q-item-label>
-                <q-item-label caption>{{ item.type}}</q-item-label>
+<!--                <q-item-label caption>{{ item.type}}</q-item-label>-->
                 <q-item-label v-if="!currentUser.is_admin" caption>Qty : {{ item.volume}}</q-item-label>
+                <q-item-label v-if="currentUser.is_admin" caption class="text-bold">£{{ formatNum(item.good_amount) }}</q-item-label>
+
               </q-item-section>
               <q-item-section side>
                 <template v-if="currentUser.is_admin">
@@ -28,7 +30,7 @@
 
               </q-item-section>
             </q-item>
-            <q-separator inset="item" />
+            <q-separator  />
           </template>
 
         </q-list>
@@ -87,14 +89,14 @@
             <q-input v-model="form.volume" :rules="[ val => !!val || 'Volume is required']"
                      clearable :hint="product.volume+' Stock Available'" type="number" label="Volume : " />
 
-            <q-item-label v-if="form.volume > product.volume - 1" class="text-negative">You can't order more than the available warehouse stock</q-item-label>
+            <q-item-label v-if="form.volume > product.volume" class="text-negative">You can't order more than the available warehouse stock</q-item-label>
 
 
           </q-card-section>
 
           <q-card-actions align="right" class="text-primary">
             <q-btn flat label="Cancel" v-close-popup />
-            <q-btn v-if="parseInt(form.volume) < parseInt(product.volume)" flat label="Add to Cart" type="submit" />
+            <q-btn v-if="parseInt(form.volume) <= parseInt(product.volume)" flat label="Add to Cart" type="submit" />
           </q-card-actions>
         </form>
       </q-card>

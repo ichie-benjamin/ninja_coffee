@@ -1,6 +1,6 @@
 <template>
   <q-page class="">
-    <div class="q-pa-md">
+    <div class="q-pa-md" style="margin-bottom: 40px">
 <!--      <div class="q-gutter-md full-width" style="" >-->
 <!--        <q-input v-model="text" label="Search" />-->
 
