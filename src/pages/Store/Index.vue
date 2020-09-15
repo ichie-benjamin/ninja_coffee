@@ -14,9 +14,9 @@
                 <q-item-label lines="1">{{  item.name }}</q-item-label>
                 <q-item-label caption>{{ item.email }}</q-item-label>
               </q-item-section>
-<!--              <q-item-section side top>-->
-<!--                <q-btn v-if="currentUser.is_admin" class="" @click="confirm(item)" color="red" size="12px" flat dense round icon="delete" />-->
-<!--              </q-item-section>-->
+              <q-item-section side top>
+                <q-btn v-if="currentUser.is_admin" class="" @click="edit(item)" color="warning" size="12px" dense round icon="edit" />
+              </q-item-section>
             </q-item>
             <q-separator />
           </template>
@@ -24,6 +24,33 @@
         </q-list>
       </div>
     </div>
+
+
+    <q-dialog v-model="prompt" persistent>
+
+      <q-card style="min-width: 350px" >
+        <q-btn color="negative" flat icon="close" v-close-popup />
+
+        <q-form @submit.prevent="update" class="q-gutter-md">
+
+        <q-card-section>
+          <q-input  v-model="form.name" clearable label="Store Name : " />
+
+          <q-item-label class="q-mt-md">Login Details</q-item-label>
+
+          <q-input  v-model="form.email" disable type="email" label="Email Address : " />
+          <q-input  v-model="form.password" type="password" disable label="Password : " />
+        </q-card-section>
+
+        <q-card-actions>
+          <q-btn label="Update" class="full-width no-border q-mt-md" unelevated padding="13px 10px" type="submit" color="black"/>
+
+        </q-card-actions>
+
+        </q-form>
+        <q-separator />
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -35,7 +62,13 @@ export default {
   name: "Index",
   data(){
     return {
-      text : ''
+      text : '',
+      prompt:false,
+      form:{
+        name:'',
+        password:'***********',
+        email:'',
+      }
     }
   },
   created() {
@@ -68,6 +101,30 @@ export default {
         .catch(error => {
           this.$q.loading.hide()
         });
+    },
+    edit(item){
+      this.prompt = true;
+      this.form.name = item.name;
+      this.form.id = item.id;
+      this.form.email = item.email
+    },
+    update(){
+      this.$q.loading.show();
+      firebaseDb.collection("users").doc(this.form.id).set({
+        name: this.form.name,
+        email: this.form.email,
+        is_admin: false,
+      }).then(()=>{
+        this.$q.loading.hide();
+
+        this.$q.notify({
+          message: 'Store successfully updated',
+          color: 'secondary'
+        });
+        this.getStores();
+        this.prompt = false;
+      })
+
     },
     confirm (item) {
       this.$q.dialog({

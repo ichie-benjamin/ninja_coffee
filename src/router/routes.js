@@ -14,6 +14,7 @@ import Carts from "pages/admin/Carts";
 import OrderDetails from "pages/admin/OrderDetails";
 import All from "pages/Store/All";
 import StoreOverview from "pages/admin/StoreOverview";
+import Profile from "pages/Profile";
 
 const routes = [
   {
@@ -38,6 +39,7 @@ const routes = [
       { path: 'add/store', component: AddShop, meta: { requiresAuth: true, name: 'Add Store'}  },
       {path: '/order/:id/:ref', component: OrderDetails, meta: {name: "Order Details"}},
       {path: '/store/:id/:name', component: StoreOverview, meta: {name: "Store Stock"}},
+      {path: '/profile', component: Profile, meta: {name: "Profile"}},
     ]
   },
   {

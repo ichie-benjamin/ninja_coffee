@@ -59,22 +59,24 @@
       <q-separator class="q-mt-lg q-mb-lg" color="dark" />
 
       <div class="col-12">
-        <q-item-label>Orders:</q-item-label>
+        <q-item-label>Others:</q-item-label>
       </div>
       <div class="col-4 box" @click="goto('/admin/orders')">
         <q-icon name="fact_check" size="34px" />
-        <q-item-label class="q-mt-sm">Check</q-item-label>
+        <q-item-label class="q-mt-sm">Orders</q-item-label>
       </div>
-      <div class="col-4 box1">
+      <div class="col-4 box" @click="goto('/profile')">
+        <q-icon name="person_pin" size="34px" />
+        <q-item-label class="q-mt-sm">Profile</q-item-label>
+      </div>
 
-      </div>
       <div class="col-4 box1">
 
       </div>
     </div>
     <div v-if="!currentUser.is_admin" class="row q-pa-lg q-gutter-md justify-around">
       <div class="col-12">
-        <q-item-label>STOCK :</q-item-label>
+        <q-item-label>DASHBOARD :</q-item-label>
       </div>
       <div class="col-4 box" style="width: 100%!important;" @click="goto('/product')">
 
@@ -87,10 +89,17 @@
           <q-icon name="local_grocery_store" size="34px" />
           <q-item-label class="q-mt-sm">Update Stock</q-item-label>
 
-      </div>    <div class="col-4 box" style="width: 100%!important;" @click="goto('admin/stock/overview')">
+      </div>
+      <div class="col-4 box" style="width: 100%!important;" @click="goto('admin/stock/overview')">
 
           <q-icon name="storefront" size="34px" />
           <q-item-label class="q-mt-sm">Stock Overview</q-item-label>
+
+      </div>
+      <div class="col-4 box" style="width: 100%!important;" @click="goto('/profile')">
+
+          <q-icon name="person_pin" size="34px" />
+          <q-item-label class="q-mt-sm">Update Account</q-item-label>
 
       </div>
 <!--      <div class="col-4 box1">-->

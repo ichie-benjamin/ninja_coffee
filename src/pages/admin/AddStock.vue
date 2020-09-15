@@ -7,7 +7,7 @@
           <div v-if="product_id">
           <q-item-label class="text-bold text-center text-h6 q-mb-md">Update {{  form.name }} Stock :</q-item-label>
           <q-input  v-model="form.volume" :rules="[val => !!val || 'Field is required']" clearable label="Volume : " />
-          <q-input v-model="form.good_amount" clearable type="number" label="Wholesale Price : " />
+          <q-input step="any" prefix="£" v-model="form.good_amount" clearable type="number" label="Wholesale Price : " />
 
           <q-item-label class="q-mt-lg">Barcode : {{ result }} </q-item-label>
 
@@ -108,6 +108,7 @@ export default {
 
     onDecode (result) {
       this.result = result;
+      console.log(result)
       this.updated = false,
       firebaseDb.collection("products").where('barcode', '==', result).get()
         .then(querySnapshot => {

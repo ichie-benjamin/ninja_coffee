@@ -150,7 +150,7 @@
                 firebaseDb.collection("users").doc(userId).set({
                   name: this.formData.name,
                   email: this.formData.email,
-                  is_admin: 0,
+                  is_admin: false,
                 })
                 this.$q.notify({
                   message: 'Store successfully created',
